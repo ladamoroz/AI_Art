@@ -96,25 +96,17 @@ def create_population():
     return new_population
 
 
-# reproduction within population
-def reproduce(population):
-
-    # producing 2 children from 2 parents with use of single-point crossover
-    def crossover(parent1, parent2):
-        child1 = copy.deepcopy(parent1)
-        child2 = copy.deepcopy(parent2)
-        point = np.random.randint(0, 3)
-        child1[:point] = parent2[:point]
-        child1[:point] = parent1[:point]
-
-        return child1, child2
-
-    # create new population with addition of children from each two chromosomes
+# reproduction within population with use of single-point crossover
+def crossover(population):
     new_population = []
     for i in range(POPULATION_SIZE):
         for j in range(POPULATION_SIZE):
             if i != j:
-                child1, child2 = crossover(population[i], population[j])
+                child1 = copy.deepcopy(population[i])
+                child2 = copy.deepcopy(population[j])
+                point = np.random.randint(0, CHROMOSOME_SIZE)
+                child1[:point] = copy.deepcopy(population[j][:point])
+                child1[:point] = copy.deepcopy(population[i][:point])
                 new_population.append(child1)
                 new_population.append(child2)
             else:
@@ -126,16 +118,11 @@ def reproduce(population):
 # mutate some chromosomes in the population
 def mutate(population):
 
-    # mutation of chromosome by changing color in the chromosome
-    def mutation(gene):
-        c = random.choice(SEGMENT_COLORS)
-        gene = c
-        return gene
-
     for i in range(POPULATION_SIZE):
         for j in range(CHROMOSOME_SIZE):
             if np.random.uniform(low=0.0) <= MUTATION_PROBABILITY:
-                population[i][j] = mutation(population[i][j])
+                population[i][j] = random.choice(SEGMENT_COLORS)
+                
     return population
 
 
@@ -164,7 +151,7 @@ def main(segment):
         temp_pop = []
         for i in range(POPULATION_SIZE):
             temp_pop.append(new_population[i][0])
-        population = reproduce(mutate(temp_pop))
+        population = crossover(mutate(temp_pop))
     return best_chromosome
 
 
